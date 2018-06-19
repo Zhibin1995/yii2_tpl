@@ -1,0 +1,23 @@
+1，配置gii模块，添加 
+    'generators' => [
+        'jeemoo_generator' => 'jeemoo\generator\crud\Generator',
+     ],
+
+    添加后效果如下
+    if (YII_ENV_DEV) {
+        $config['bootstrap'][] = 'debug';
+        $config['modules']['debug'] = [
+            'class' => 'yii\debug\Module',
+        // uncomment the following to add your IP if you are not connecting from localhost.
+        //'allowedIPs' => ['127.0.0.1', '::1'],
+        ];
+
+        $config['bootstrap'][] = 'gii';
+        $config['modules']['gii'] = [
+            'class' => 'yii\gii\Module',
+            'allowedIPs' => ['127.0.0.1', '::1'],
+            'generators' => [
+                'jeemoo_generator' => 'jeemoo\generator\crud\Generator',
+            ],
+        ];
+    }

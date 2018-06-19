@@ -1,0 +1,111 @@
+1，执行sql添加相关表(jeemoo_rbac.sql)
+
+2，替换菜单，打开 views/site/index 把菜单部分替换成  <?= $this->render('@jeemoo/rbac/views/menu/_menu', ['items' => \jeemoo\rbac\models\Menu::getUserMenus(), 'parent' => null]) ?>
+
+3，添加别名
+    	'aliases' => [
+            '@jeemoo' => dirname(__DIR__) . '/vendor/jeemoo',
+    	],
+	添加之后大概这样
+	$config = [
+    	    'id' => 'basic',
+    	    'name' => 'JM_BASIC_TEMPLATE',
+    	    'bootstrap' => ['log'],
+    	    'language' => 'zh-CN',
+    	    'timeZone' => 'Asia/Chongqing',
+    	    'basePath' => dirname(__DIR__),
+	    'aliases' => [
+                '@jeemoo' => dirname(__DIR__) . '/vendor/jeemoo',
+    	    ],
+    	    'controllerMap'=>[
+        	'menu' => 'jeemoo\rbac\controllers\MenuController',
+        	'permission' => 'jeemoo\rbac\controllers\PermissionController',
+        	'role' => 'jeemoo\rbac\controllers\RoleController',
+        	'user-role' => 'jeemoo\rbac\controllers\UserRoleController',
+    	    ],
+    	    'components' => [
+		......
+	    ]
+	]
+4，修改配置文件
+	如果在module里使用，就在模块的定义文件的 init 方法里加入 
+
+        $this->controllerMap = [
+            'menu' => 'jeemoo\rbac\controllers\MenuController',
+            'permission' => 'jeemoo\rbac\controllers\PermissionController',
+            'role' => 'jeemoo\rbac\controllers\RoleController',
+            'user-role' => 'jeemoo\rbac\controllers\UserRoleController',
+        ];
+	添加之后大概这样
+	public function init()
+    	{	
+            parent::init();
+
+            $this->controllerMap = [
+                'menu' => 'jeemoo\rbac\controllers\MenuController',
+                'permission' => 'jeemoo\rbac\controllers\PermissionController',
+                'role' => 'jeemoo\rbac\controllers\RoleController',
+                'user-role' => 'jeemoo\rbac\controllers\UserRoleController',
+            ];
+	    ......
+	}
+	
+
+	如果不是在module里，在配置文件 main.php（或其它）里  'components'上面加入
+ 	
+  	'controllerMap'=>[
+            'menu' => 'jeemoo\rbac\controllers\MenuController',
+            'permission' => 'jeemoo\rbac\controllers\PermissionController',
+            'role' => 'jeemoo\rbac\controllers\RoleController',
+            'user-role' => 'jeemoo\rbac\controllers\UserRoleController',
+    	],
+	添加之后大概这样
+	$config = [
+    	    'id' => 'basic',
+    	    'name' => 'JM_BASIC_TEMPLATE',
+    	    'bootstrap' => ['log'],
+    	    'language' => 'zh-CN',
+    	    'timeZone' => 'Asia/Chongqing',
+    	    'basePath' => dirname(__DIR__),
+    	    'controllerMap'=>[
+        	'menu' => 'jeemoo\rbac\controllers\MenuController',
+        	'permission' => 'jeemoo\rbac\controllers\PermissionController',
+        	'role' => 'jeemoo\rbac\controllers\RoleController',
+        	'user-role' => 'jeemoo\rbac\controllers\UserRoleController',
+    	    ],
+    	    'components' => [
+		......
+	    ]
+	]
+
+5，在需要角色控制权限的控制器里加入
+    public function behaviors()
+    {
+        return [
+            'access' => [
+                'class' => \jeemoo\rbac\common\AccessControl::className(),
+            ]
+        ];
+    }
+
+6，在配置文件里设置组件
+    "authManager" => [
+        "class" => 'jeemoo\rbac\common\AuthManager',
+    ],
+    设置完后
+     'components' => [
+     	'session' => [
+             'name' => '_app_admin',
+             'class' => 'yii\web\Session',
+         ],
+        "authManager" => [
+            "class" => 'jeemoo\rbac\common\AuthManager',
+        ],
+    ]
+
+6，其它
+    编辑用户角色
+    <?= \jeemoo\rbac\common\HtmlUtils::a('角色', 'admin/user-role/edit', ['id' => $item->id], ['class' => 'btn dialog', 'title' => '编辑角色'], ['height' => 350]) ?>
+
+    显示用户角色
+    <?=\jeemoo\rbac\models\UserRole::getRoleNames($item)?>
